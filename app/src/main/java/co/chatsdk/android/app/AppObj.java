@@ -27,7 +27,8 @@ public class AppObj extends MultiDexApplication {
 //        builder.firebaseRootPath("firebase_v4_web_new_4");
         config.firebaseRootPath("18_12_bug");
         config.googleMaps("AIzaSyCwwtZrlY9Rl8paM0R6iDNBEit_iexQ1aE");
-        config.publicRoomCreationEnabled(false);
+        config.publicRoomCreationEnabled(true);
+        config.locationMessagesEnabled(false);
         config.pushNotificationSound("default");
 //        config.pushNotificationsForPublicChatRoomsEnabled(true);
 
