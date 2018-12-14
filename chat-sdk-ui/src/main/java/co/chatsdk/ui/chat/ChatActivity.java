@@ -18,6 +18,8 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import androidx.appcompat.app.ActionBar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import android.text.Html;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -28,6 +30,7 @@ import android.widget.TextView;
 import com.facebook.drawee.view.SimpleDraweeView;
 
 import org.apache.commons.lang3.StringUtils;
+import org.json.JSONObject;
 import org.ocpsoft.prettytime.PrettyTime;
 
 import java.util.List;
@@ -59,6 +62,7 @@ import co.chatsdk.core.utils.PermissionRequestHandler;
 import co.chatsdk.core.utils.StringChecker;
 import co.chatsdk.core.utils.Strings;
 import co.chatsdk.ui.R;
+import co.chatsdk.ui.api.SpellCheckAPI;
 import co.chatsdk.ui.contacts.ContactsFragment;
 import co.chatsdk.ui.contacts.SelectContactActivity;
 import co.chatsdk.ui.main.BaseActivity;
@@ -70,6 +74,10 @@ import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import timber.log.Timber;
 
 public class ChatActivity extends BaseActivity implements TextInputDelegate, ChatOptionsDelegate {
@@ -863,7 +871,56 @@ public class ChatActivity extends BaseActivity implements TextInputDelegate, Cha
 
     @Override
     public void onSendPressed(String text) {
-        sendMessage(text, true);
+        postCorrectSpellMessage(text);
+    }
+
+    // 맞춤법에 맞게 message를 다시 설정하여 firebase에 전송하는 함수
+    private void postCorrectSpellMessage(String text) {
+
+        if (text.length() > 500) {
+            // 500자 초과의 메세지는 그대로 전송 (네이버 맞춤법 검사기가 500자 까지 지원)
+            sendMessage(text, true);
+            return;
+        }
+
+        // HTTP 요청 전송 준비 작업
+        SpellCheckAPI api = SpellCheckAPI.retrofit.create(SpellCheckAPI.class);
+        Call<ResponseBody> http = api.Speller(text);
+
+        // HTTP 요청 전송 (비동기)
+        http.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                // 맞춤법 검사기 요청이 성공했으면 변환된 메시지를 전송
+
+                // 먼저 받은 Response Body를 문자열 형태로 변환
+                String result;
+                try {
+                    result = response.body().string();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    onFailure(call, new Throwable(e.getMessage()));
+                    return;
+                }
+
+                // JSON 데이터 파싱으로 변환된 메시지를 추출
+                try {
+                    JSONObject jsonObject = new JSONObject(result);
+                    jsonObject = jsonObject.getJSONObject("message").getJSONObject("result");
+                    sendMessage(Html.fromHtml(jsonObject.getString("notag_html")).toString(),
+                        true); // 메시지 전송
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    onFailure(call, new Throwable(e.getMessage()));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                // 맞춤법 검사기 요청이 실패했으면 원래 메시지를 그대로 전송
+                sendMessage(text, true);
+            }
+        });
     }
 
     @Override
