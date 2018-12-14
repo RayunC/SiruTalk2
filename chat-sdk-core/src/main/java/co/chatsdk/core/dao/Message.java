@@ -247,6 +247,8 @@ public class Message implements CoreEntity {
     }
 
     public String getText() {
+        // 숫자로만 이루어진 메시지는 화면에 보이지 않는 오류를 수정
+        // 오류의 원인은 메시지가 정수형으로 인식이 되었던 것이고, String 으로 변환하여 해결
         return MetaValueHelper.toString(valueForKey(Keys.MessageText));
     }
 
