@@ -247,7 +247,7 @@ public class Message implements CoreEntity {
     }
 
     public String getText() {
-        return stringForKey(Keys.MessageText);
+        return MetaValueHelper.toString(valueForKey(Keys.MessageText));
     }
 
     public void setText(String text) {
