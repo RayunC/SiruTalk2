@@ -131,7 +131,7 @@
 GPLv3 License https://github.com/cjh9727/SiruTalk/blob/master/LICENSE
 
 ## 6. 개발자 정보
-+ 1515035 신채연(acc11311) : HTTP 요청 전송 작업, firebase, 중간 ppt 제작, 기말 발표자
-+ 1771025 방수정(tnwjd7732) : 맞춤법 교정 API, UI, 중간 발표자, 동영상 편집
-+ 1771054 최라윤(RayunC) : 맞춤법 교정 API, UI, 중간 발표자, 기말 ppt 제작, 기말 발표자
++ 1515035 신채연(acc11311) : HTTP 요청 전송 작업, firebase, 중간 ppt 제작, 기말 발표자, 동영상 촬영
++ 1771025 방수정(tnwjd7732) : 맞춤법 교정 API, UI, 주요 기능 추가, 중간 발표자, 동영상 편집
++ 1771054 최라윤(RayunC) : 맞춤법 교정 API, UI, 주요 기능 추가, 중간&기말 발표자, 기말 ppt 제작, 동영상 촬영
 + 1771109 최정화(cjh9727) : HTTP 요청 전송 작업, 앱 로고 디자인, UI, 기말 ppt 제작
