@@ -31,11 +31,13 @@
 + 유사 라이브러리 Volley에 비하여 25 discussions 기준 약  4.2배, AsyncTask에 비하여 14배 빠른 속도를 가짐을 알 수 있다.
 + Retrofit2를 이용하기 위한 2단계 기초작업
 
-          //먼저 Gradle Scripts>build.gradle(Module:chat-sdk-ui)
-		implementation 'com.squareup.retrofit2:retrofit:2.5.0'
+```ruby
+//먼저 Gradle Scripts>build.gradle(Module:chat-sdk-ui)
+implementation 'com.squareup.retrofit2:retrofit:2.5.0'
 
-          //그 다음, 네트워크 사용을 위해 app단위 manifest파일에 아래 인터넷 사용 허가를 추가
-		<uses-permission android:name="android.permission.INTERNET"/>
+//그 다음, 네트워크 사용을 위해 app단위 manifest파일에 아래 인터넷 사용 허가를 추가
+<uses-permission android:name="android.permission.INTERNET"/>
+```
 
 + 기본으로 제공하는 5가지 요청 어노테이션 (@GET, @POST, @PUT, @DELETE, @HEAD) 중 시루톡은 @GET request를 통해 데이터를 읽어온다.
 
@@ -45,20 +47,23 @@
 + SpellCheckAPI 인터페이스는 naver 맞춤법 검사 URL에 입력받은 문자열을 더해 교정을 요청한다.
 + base URL은 naver 모바일 버전의 기본 URL에 /를 더한 "https://m.search.naver.com/" 이며, 뒷부분은 전달받는 값에따라 달라진다.
 
-        // query를 넣어주면 해당 문자열을 맞춤법에 맞게 교정하도록 네이버에 요청
-        public interface SpellCheckAPI {
-	  //5가지 어노테이션 중, 데이터를 받아오는 @GET request 사용
-        @GET("p/csearch/ocontent/util/SpellerProxy?color_blindness=0") 
-        Call Speller(@Query("q") String query);
+```ruby
+// query를 넣어주면 해당 문자열을 맞춤법에 맞게 교정하도록 네이버에 요청
+public interface SpellCheckAPI {
+//5가지 어노테이션 중, 데이터를 받아오는 @GET request 사용
+@GET("p/csearch/ocontent/util/SpellerProxy?color_blindness=0") 
+Call Speller(@Query("q") String query);
       
-        // retrofit 객체 (네이버 맞춤법 검사 URL에 맞게 생성)
-        Retrofit retrofit = new Retrofit.Builder() .baseUrl("https://m.search.naver.com/") .build(); }
-        
+// retrofit 객체 (네이버 맞춤법 검사 URL에 맞게 생성)
+Retrofit retrofit = new Retrofit.Builder() .baseUrl("https://m.search.naver.com/") .build(); }
+```
+
 ### 3-3. 맞춤법 검사 구현 - ChatActivity
 #### A. 500자 초과 메세지 
 + 맞춤법을 교정하는 postCorrectSpellMessage는 onSendPressed 메소드에서 호출된다.
 + 매개변수로 사용자가 입력한 text를 넘겨받는다.
 
+	```ruby
       public void onSendPressed(String text) {
         postCorrectSpellMessage(text);
       }
@@ -71,17 +76,22 @@
       sendMessage(text, true);
       return; 
       }
+      
+      ```
 
 #### B. 요청 준비작업
 + HTTP 요청 전송 준비 작업으로 SpellCheckAPI의 객체를 생성한다.
 + 사용자의 입력인 text를 Speller의 query로 넘겨 맞춤법 검사기 URL에 요청하는 과정이다. 
 
+```ruby
       SpellCheckAPI api = SpellCheckAPI.retrofit.create(SpellCheckAPI.class);
       Call http = api.Speller(text);
+```
 
 #### C. http 요청 성공 - OnResponse
 + HTTP 요청에 성공하면 onResponse 메소드가 수행된다.
 
+```ruby
       String result;
       try {
       //받은 Response Body를 문자열 형태로 변환 
@@ -91,11 +101,13 @@
       onFailure(call, new Throwable(e.getMessage()));
       return;
       }
+```
 
 + 통신의 결과로 받은 데이터 JSON(JavaScript Object Notation)파일을 사용 가능한 데이터로 파싱하고 변환된 메시지를 추출하는 과정이다.
 + JSON 파일의 데이터가 {}로 묶여있어 JSONObject 타입으로 받아온다.
 + 데이터 파싱을 통해 얻은 result를 sendMessage 메소드를 통해 전송하며 마무리한다.
-      
+  
+```ruby
       try {
       //{}로 묶인 object타입의 데이터를 받기 위해 JSONObject 타입으로 받아오기
       JSONObject jsonObject = new JSONObject(result);
@@ -107,13 +119,15 @@
       e.printStackTrace();
       onFailure(call, new Throwable(e.getMessage()));
       }
+```
       
 #### D. http 요청 실패 - onFailure
 + 맞춤법 검사기 요청이 실패하면 교정 과정을 거치지 않고 사용자 입력 메시지를 전송한다.
-      
+ 
+```ruby
       public void onFailure(Call call, Throwable t) {
       sendMessage(text, true); }
-
+```
 
 ### 3-4 주요 기능 스크린 샷 
 
@@ -132,6 +146,6 @@ GPLv3 License https://github.com/cjh9727/SiruTalk/blob/master/LICENSE
 
 ## 6. 개발자 정보
 + 1515035 신채연(acc11311) : HTTP 요청 전송 작업, firebase, 중간 ppt 제작, 기말 발표자
-+ 1771025 방수정(tnwjd7732) : 맞춤법 교정 API, UI, 중간 발표자, 동영상 편집
-+ 1771054 최라윤(RayunC) : 맞춤법 교정 API, UI, 중간 발표자, 기말 ppt 제작, 기말 발표자
++ 1771025 방수정(tnwjd7732) : 맞춤법 교정 API, UI, retrofit 관련, 중간 발표자, 동영상 편집
++ 1771054 최라윤(RayunC) : 맞춤법 교정 API, UI, 맞춥법 수정 기능, 기말 ppt 제작, 중간&기말 발표자
 + 1771109 최정화(cjh9727) : HTTP 요청 전송 작업, 앱 로고 디자인, UI, 기말 ppt 제작
